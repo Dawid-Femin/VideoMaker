@@ -1,4 +1,4 @@
-import { AbsoluteFill, useCurrentFrame, staticFile } from "remotion";
+import { AbsoluteFill, useCurrentFrame, staticFile, Audio } from "remotion";
 import { useRef } from "react";
 import { StrokePath } from "./StrokePath";
 import { Hand } from "./Hand";
@@ -51,6 +51,10 @@ export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
 
   return (
     <AbsoluteFill style={{ background: scene.background }}>
+      {/* Audio — only if audioSrc is defined in scene.json */}
+      {scene.audioSrc && (
+        <Audio src={staticFile(scene.audioSrc)} />
+      )}
       {/* SVG layer — all strokes */}
       <svg
         width={scene.width}

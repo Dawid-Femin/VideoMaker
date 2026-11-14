@@ -4,6 +4,7 @@
   "width": 1920,
   "height": 1080,
   "background": "#ffffff",
+  "audioSrc": "twoj-plik.mp3",
   "strokes": [
     {
       "id": "stroke-1",
