@@ -18,12 +18,13 @@ export const sampleScene: Scene = {
       fillColor: "none",
     },
   ],
-  // hand is optional — uncomment and provide hand.png to test hand tracking:
-  // hand: {
-  //   imageSrc: "/hand.png",
-  //   penOffsetX: 42,
-  //   penOffsetY: 118,
-  //   width: 200,
-  //   height: 200,
-  // },
+  hand: {
+    imageSrc: "hand.png",
+    // Original image: 1388×989px, pen tip at x=0, y=270
+    // Displayed at 50% scale (694×494), so offset scales proportionally
+    penOffsetX: 0,
+    penOffsetY: 135,
+    width: 694,
+    height: 494,
+  },
 };
