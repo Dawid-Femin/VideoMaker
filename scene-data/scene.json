@@ -1,0 +1,43 @@
+{
+  "fps": 30,
+  "durationInSeconds": 10,
+  "width": 1920,
+  "height": 1080,
+  "background": "#ffffff",
+  "strokes": [
+    {
+      "id": "stroke-1",
+      "d": "M 200 540 C 400 200 800 200 960 540 C 1120 880 1520 880 1720 540",
+      "startFrame": 10,
+      "durationFrames": 80,
+      "strokeColor": "#1a1a1a",
+      "strokeWidth": 6,
+      "fillColor": "none"
+    },
+    {
+      "id": "stroke-2",
+      "d": "M 300 300 L 900 300 L 900 780 L 300 780 Z",
+      "startFrame": 100,
+      "durationFrames": 80,
+      "strokeColor": "#e63946",
+      "strokeWidth": 5,
+      "fillColor": "none"
+    },
+    {
+      "id": "stroke-3",
+      "d": "M 960 200 C 1200 200 1400 400 1400 540 C 1400 680 1200 880 960 880",
+      "startFrame": 190,
+      "durationFrames": 80,
+      "strokeColor": "#2a9d8f",
+      "strokeWidth": 5,
+      "fillColor": "none"
+    }
+  ],
+  "hand": {
+    "imageSrc": "hand.png",
+    "penOffsetX": 0,
+    "penOffsetY": 135,
+    "width": 694,
+    "height": 494
+  }
+}
