@@ -3,7 +3,17 @@ import { z } from "zod";
 export const StrokeSchema = z.object({
   id: z.string(),
   d: z.string(),
-  startFrame: z.number().int().nonnegative(),
+  /**
+   * Frame at which drawing starts.
+   * Optional — if omitted, buildTimeline calculates it automatically
+   * based on the previous stroke's end + delayFrames.
+   */
+  startFrame: z.number().int().nonnegative().optional(),
+  /**
+   * Frames to wait after the previous stroke finishes before this one starts.
+   * Only used when startFrame is omitted. Defaults to 0.
+   */
+  delayFrames: z.number().int().nonnegative().optional().default(0),
   durationFrames: z.number().int().positive(),
   strokeColor: z.string(),
   strokeWidth: z.number().positive(),

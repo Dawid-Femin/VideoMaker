@@ -1,14 +1,17 @@
 import { SceneSchema } from "./sceneSchema";
+import { buildTimeline } from "../utils/buildTimeline";
 import type { Scene } from "../types/Scene";
 
 /**
- * Loads and validates a scene.json file.
+ * Loads and validates a scene.json file, then builds the timeline.
  *
- * Usage (in Root.tsx or any module-level import):
+ * - Validates the raw JSON against SceneSchema (throws on invalid input).
+ * - Runs buildTimeline to fill in missing startFrame values based on
+ *   the previous stroke's end + delayFrames.
+ *
+ * Usage:
  *   import sceneData from "../../scene-data/scene.json";
  *   const scene = loadScene(sceneData);
- *
- * Throws a descriptive error if the JSON does not match the expected schema.
  */
 export function loadScene(raw: unknown): Scene {
   const result = SceneSchema.safeParse(raw);
@@ -20,5 +23,10 @@ export function loadScene(raw: unknown): Scene {
     throw new Error(`Invalid scene.json:\n${messages}`);
   }
 
-  return result.data;
+  const data = result.data;
+
+  return {
+    ...data,
+    strokes: buildTimeline(data.strokes),
+  };
 }

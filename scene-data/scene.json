@@ -9,7 +9,7 @@
     {
       "id": "stroke-1",
       "d": "M 200 540 C 400 200 800 200 960 540 C 1120 880 1520 880 1720 540",
-      "startFrame": 10,
+      "delayFrames": 10,
       "durationFrames": 80,
       "strokeColor": "#1a1a1a",
       "strokeWidth": 6,
@@ -19,7 +19,7 @@
     {
       "id": "stroke-2",
       "d": "M 300 300 L 900 300 L 900 780 L 300 780 Z",
-      "startFrame": 110,
+      "delayFrames": 20,
       "durationFrames": 80,
       "strokeColor": "#e63946",
       "strokeWidth": 5,
@@ -29,7 +29,7 @@
     {
       "id": "stroke-3",
       "d": "M 960 200 C 1200 200 1400 400 1400 540 C 1400 680 1200 880 960 880",
-      "startFrame": 210,
+      "delayFrames": 20,
       "durationFrames": 80,
       "strokeColor": "#2a9d8f",
       "strokeWidth": 5,
