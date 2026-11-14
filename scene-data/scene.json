@@ -39,6 +39,7 @@
     "penOffsetX": 0,
     "penOffsetY": 135,
     "width": 694,
-    "height": 494
+    "height": 494,
+    "betweenStrokes": "freeze"
   }
 }

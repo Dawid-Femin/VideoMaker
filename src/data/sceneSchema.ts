@@ -16,6 +16,7 @@ export const HandSchema = z.object({
   penOffsetY: z.number(),
   width: z.number().positive(),
   height: z.number().positive(),
+  betweenStrokes: z.enum(["hide", "freeze"]).optional().default("hide"),
 });
 
 export const SceneSchema = z.object({

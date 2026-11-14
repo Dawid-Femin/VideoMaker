@@ -12,7 +12,7 @@ export interface Stroke {
 }
 
 export interface Hand {
-  /** Path to the hand PNG image (relative to public/ or absolute URL) */
+  /** Path to the hand PNG image (relative to public/) */
   imageSrc: string;
   /** X offset in pixels from the top-left of the image to the pen tip */
   penOffsetX: number;
@@ -20,6 +20,12 @@ export interface Hand {
   penOffsetY: number;
   width: number;
   height: number;
+  /**
+   * What the hand does between strokes:
+   * - "hide"   — invisible between strokes (default)
+   * - "freeze" — stays at the last drawn point until the next stroke begins
+   */
+  betweenStrokes?: "hide" | "freeze";
 }
 
 export interface Scene {

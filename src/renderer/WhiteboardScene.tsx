@@ -8,53 +8,98 @@ interface WhiteboardSceneProps {
   scene: Scene;
 }
 
+/** Returns the pen tip point for a given stroke at the given frame. */
+function getPenTip(
+  el: SVGPathElement,
+  startFrame: number,
+  durationFrames: number,
+  frame: number
+): DOMPoint {
+  const totalLength = el.getTotalLength();
+  const progress = Math.min(
+    1,
+    Math.max(0, (frame - startFrame) / durationFrames)
+  );
+  return el.getPointAtLength(progress * totalLength);
+}
+
 export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
   const frame = useCurrentFrame();
 
-  // One ref per stroke — hooks must not be called conditionally,
-  // so we keep a stable map via a plain object keyed by stroke id.
-  // We use a single ref to a Map to avoid creating new refs on every render.
+  // Stable map of refs — one per stroke id
   const pathRefs = useRef<Map<string, React.RefObject<SVGPathElement>>>(
     new Map()
   );
-
-  // Ensure every stroke has a ref entry (safe to call each render — Map is stable)
   scene.strokes.forEach((s) => {
     if (!pathRefs.current.has(s.id)) {
       pathRefs.current.set(s.id, { current: null });
     }
   });
 
-  // Determine which stroke is currently being drawn
+  // Strokes sorted by startFrame (scene.json should already be ordered,
+  // but we sort defensively so edge-case logic is correct)
+  const sortedStrokes = [...scene.strokes].sort(
+    (a, b) => a.startFrame - b.startFrame
+  );
+
+  // Which stroke is actively being drawn right now?
   const activeStroke =
-    scene.strokes.find(
+    sortedStrokes.find(
       (s) => frame >= s.startFrame && frame <= s.startFrame + s.durationFrames
     ) ?? null;
 
-  // Calculate pen tip synchronously from the DOM element (Chromium — DOM is live)
+  // Last stroke that has already finished (for "freeze" mode)
+  const lastFinishedStroke =
+    [...sortedStrokes]
+      .reverse()
+      .find((s) => frame > s.startFrame + s.durationFrames) ?? null;
+
+  // --- Pen tip & visibility logic ---
+  const betweenStrokes = scene.hand?.betweenStrokes ?? "hide";
+  const firstStrokeStart = sortedStrokes[0]?.startFrame ?? 0;
+  const lastStrokeEnd =
+    (sortedStrokes[sortedStrokes.length - 1]?.startFrame ?? 0) +
+    (sortedStrokes[sortedStrokes.length - 1]?.durationFrames ?? 0);
+
+  const isBeforeAnyStroke = frame < firstStrokeStart;
+  const isAfterAllStrokes = frame > lastStrokeEnd;
+  const isBetweenStrokes = !activeStroke && !isBeforeAnyStroke && !isAfterAllStrokes;
+
   let penTip: DOMPoint | null = null;
+  let handVisible = false;
+
   if (activeStroke) {
-    const ref = pathRefs.current.get(activeStroke.id);
-    const el = ref?.current;
+    // Currently drawing — always show hand
+    const el = pathRefs.current.get(activeStroke.id)?.current;
     if (el) {
-      const totalLength = el.getTotalLength();
-      const progress = Math.min(
-        1,
-        Math.max(
-          0,
-          (frame - activeStroke.startFrame) / activeStroke.durationFrames
-        )
+      penTip = getPenTip(
+        el,
+        activeStroke.startFrame,
+        activeStroke.durationFrames,
+        frame
       );
-      penTip = el.getPointAtLength(progress * totalLength);
+      handVisible = true;
+    }
+  } else if (isBetweenStrokes && betweenStrokes === "freeze" && lastFinishedStroke) {
+    // Freeze at the end point of the last finished stroke
+    const el = pathRefs.current.get(lastFinishedStroke.id)?.current;
+    if (el) {
+      penTip = getPenTip(
+        el,
+        lastFinishedStroke.startFrame,
+        lastFinishedStroke.durationFrames,
+        lastFinishedStroke.startFrame + lastFinishedStroke.durationFrames
+      );
+      handVisible = true;
     }
   }
+  // isBeforeAnyStroke, isAfterAllStrokes, or hide mode → handVisible stays false
 
   return (
     <AbsoluteFill style={{ background: scene.background }}>
       {/* Audio — only if audioSrc is defined in scene.json */}
-      {scene.audioSrc && (
-        <Audio src={staticFile(scene.audioSrc)} />
-      )}
+      {scene.audioSrc && <Audio src={staticFile(scene.audioSrc)} />}
+
       {/* SVG layer — all strokes */}
       <svg
         width={scene.width}
@@ -71,7 +116,7 @@ export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
         ))}
       </svg>
 
-      {/* Hand layer — absolutely positioned on top of SVG */}
+      {/* Hand layer */}
       {scene.hand && (
         <Hand
           config={{
@@ -79,7 +124,7 @@ export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
             imageSrc: staticFile(scene.hand.imageSrc),
           }}
           penTip={penTip}
-          visible={activeStroke !== null}
+          visible={handVisible}
         />
       )}
     </AbsoluteFill>
