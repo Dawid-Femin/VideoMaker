@@ -1,3 +1,5 @@
+import type { EasingName } from "../utils/easing";
+
 export interface Stroke {
   id: string;
   /** SVG path data, e.g. "M 100 200 C 150 100 300 100 350 200" */
@@ -9,6 +11,8 @@ export interface Stroke {
   strokeColor: string;
   strokeWidth: number;
   fillColor: string;
+  /** Easing function applied to drawing progress. Defaults to "linear". */
+  easing?: EasingName;
 }
 
 export interface Hand {

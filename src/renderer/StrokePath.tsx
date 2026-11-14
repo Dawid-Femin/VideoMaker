@@ -1,13 +1,13 @@
 import { useCurrentFrame } from "remotion";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import type { Stroke } from "../types/Scene";
+import { applyEasing } from "../utils/easing";
 
 interface StrokePathProps {
   stroke: Stroke;
   /**
-   * Ref that will be populated with the SVGPathElement after mount.
-   * Parent can call getTotalLength / getPointAtLength on it synchronously
-   * during the same render cycle (Remotion renders in Chromium — DOM is live).
+   * Ref populated with the SVGPathElement after mount.
+   * Parent reads getTotalLength / getPointAtLength synchronously.
    */
   pathRef?: React.RefObject<SVGPathElement>;
 }
@@ -17,24 +17,23 @@ export const StrokePath: React.FC<StrokePathProps> = ({ stroke, pathRef }) => {
   const internalRef = useRef<SVGPathElement>(null);
   const ref = pathRef ?? internalRef;
 
-  const { startFrame, durationFrames } = stroke;
+  const { startFrame, durationFrames, easing = "linear" } = stroke;
+
   const rawProgress = (frame - startFrame) / durationFrames;
-  const progress = Math.min(1, Math.max(0, rawProgress));
+  const clampedProgress = Math.min(1, Math.max(0, rawProgress));
+  // Apply easing to the clamped linear progress
+  const easedProgress = applyEasing(clampedProgress, easing);
 
   const isBeforeStart = frame < startFrame;
   const isFinished = frame > startFrame + durationFrames;
 
-  // pathLength is read synchronously from the DOM element.
-  // In Remotion's Chromium renderer the element is already in the DOM
-  // when the component body runs on subsequent frames.
-  // On the very first render the ref may be null — dashoffset defaults to full.
   const pathLength = ref.current?.getTotalLength() ?? 0;
 
   const dashOffset = isBeforeStart
-    ? pathLength          // fully hidden
+    ? pathLength       // fully hidden
     : isFinished
-    ? 0                   // fully drawn
-    : pathLength * (1 - progress);
+    ? 0                // fully drawn
+    : pathLength * (1 - easedProgress);
 
   return (
     <path

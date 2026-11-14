@@ -8,6 +8,18 @@ export const StrokeSchema = z.object({
   strokeColor: z.string(),
   strokeWidth: z.number().positive(),
   fillColor: z.string(),
+  easing: z
+    .enum([
+      "linear",
+      "easeIn",
+      "easeOut",
+      "easeInOut",
+      "easeInCubic",
+      "easeOutCubic",
+      "easeInOutCubic",
+    ])
+    .optional()
+    .default("linear"),
 });
 
 export const HandSchema = z.object({

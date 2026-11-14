@@ -2,25 +2,26 @@ import { AbsoluteFill, useCurrentFrame, staticFile, Audio } from "remotion";
 import { useRef } from "react";
 import { StrokePath } from "./StrokePath";
 import { Hand } from "./Hand";
-import type { Scene } from "../types/Scene";
+import type { Scene, Stroke } from "../types/Scene";
+import { applyEasing } from "../utils/easing";
 
 interface WhiteboardSceneProps {
   scene: Scene;
 }
 
-/** Returns the pen tip point for a given stroke at the given frame. */
+/** Returns the pen tip point for a given stroke at the given frame, with easing applied. */
 function getPenTip(
   el: SVGPathElement,
-  startFrame: number,
-  durationFrames: number,
+  stroke: Stroke,
   frame: number
 ): DOMPoint {
   const totalLength = el.getTotalLength();
-  const progress = Math.min(
+  const rawProgress = Math.min(
     1,
-    Math.max(0, (frame - startFrame) / durationFrames)
+    Math.max(0, (frame - stroke.startFrame) / stroke.durationFrames)
   );
-  return el.getPointAtLength(progress * totalLength);
+  const easedProgress = applyEasing(rawProgress, stroke.easing ?? "linear");
+  return el.getPointAtLength(easedProgress * totalLength);
 }
 
 export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
@@ -69,25 +70,18 @@ export const WhiteboardScene: React.FC<WhiteboardSceneProps> = ({ scene }) => {
   let handVisible = false;
 
   if (activeStroke) {
-    // Currently drawing — always show hand
     const el = pathRefs.current.get(activeStroke.id)?.current;
     if (el) {
-      penTip = getPenTip(
-        el,
-        activeStroke.startFrame,
-        activeStroke.durationFrames,
-        frame
-      );
+      penTip = getPenTip(el, activeStroke, frame);
       handVisible = true;
     }
   } else if (isBetweenStrokes && betweenStrokes === "freeze" && lastFinishedStroke) {
-    // Freeze at the end point of the last finished stroke
     const el = pathRefs.current.get(lastFinishedStroke.id)?.current;
     if (el) {
+      // Freeze at the fully-drawn end point (progress = 1, easing doesn't matter)
       penTip = getPenTip(
         el,
-        lastFinishedStroke.startFrame,
-        lastFinishedStroke.durationFrames,
+        lastFinishedStroke,
         lastFinishedStroke.startFrame + lastFinishedStroke.durationFrames
       );
       handVisible = true;

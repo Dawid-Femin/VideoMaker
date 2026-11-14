@@ -1,6 +1,6 @@
 {
   "fps": 30,
-  "durationInSeconds": 10,
+  "durationInSeconds": 12,
   "width": 1920,
   "height": 1080,
   "background": "#ffffff",
@@ -13,25 +13,28 @@
       "durationFrames": 80,
       "strokeColor": "#1a1a1a",
       "strokeWidth": 6,
-      "fillColor": "none"
+      "fillColor": "none",
+      "easing": "easeInOutCubic"
     },
     {
       "id": "stroke-2",
       "d": "M 300 300 L 900 300 L 900 780 L 300 780 Z",
-      "startFrame": 100,
+      "startFrame": 110,
       "durationFrames": 80,
       "strokeColor": "#e63946",
       "strokeWidth": 5,
-      "fillColor": "none"
+      "fillColor": "none",
+      "easing": "easeOutCubic"
     },
     {
       "id": "stroke-3",
       "d": "M 960 200 C 1200 200 1400 400 1400 540 C 1400 680 1200 880 960 880",
-      "startFrame": 190,
+      "startFrame": 210,
       "durationFrames": 80,
       "strokeColor": "#2a9d8f",
       "strokeWidth": 5,
-      "fillColor": "none"
+      "fillColor": "none",
+      "easing": "easeInOut"
     }
   ],
   "hand": {
